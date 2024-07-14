@@ -16,7 +16,6 @@ export class TextureComponent {
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;
-    console.log(OrbitControls);
     //create a scene----------------------------------------
     const scene = new THREE.Scene();
     //scene.background = new THREE.Color('black');
@@ -48,7 +47,6 @@ export class TextureComponent {
       'nz.jpg',
     ]);
     scene.background = textureCube;
-
     loadingManager.onStart = () => {
       console.log('loading started');
     };
@@ -65,7 +63,6 @@ export class TextureComponent {
     //create a object(MESH==geometry and material)----------------------------------------
     const geometry = new THREE.SphereGeometry(1, 32, 16);
     const material = new THREE.MeshStandardMaterial({
-      color: '0xffffff',
       envMap: textureCube,
     });
     const mesh = new THREE.Mesh(geometry, material);

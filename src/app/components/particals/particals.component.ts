@@ -54,7 +54,7 @@ export class ParticalsComponent {
 
     //create a object(MESH==geometry and material)----------------------------------------
     const geometry = new THREE.BufferGeometry();
-    const vertices = 2000;
+    const vertices = 15000;
     const positions = new Float32Array(vertices * 3);
     for (let i = 0; i < vertices * 3; i++) {
       positions[i] = (Math.random() - 0.5) * 5;

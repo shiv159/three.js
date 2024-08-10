@@ -7,11 +7,12 @@ import * as dat from 'dat.gui';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [],
+  imports: [NavbarComponent],
   templateUrl: './portfolio.component.html',
   styleUrl: './portfolio.component.css',
 })

@@ -4,35 +4,47 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import * as dat from 'dat.gui';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { NavbarComponent } from '../navbar/navbar.component';
+
 @Component({
   selector: 'app-robot',
   standalone: true,
-  imports: [],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, NavbarComponent],
   templateUrl: './robot.component.html',
   styleUrl: './robot.component.css',
 })
 export class RobotComponent {
   @ViewChild('canvas', { static: true })
   canvasRef!: ElementRef<HTMLCanvasElement>;
-  private mixer?: THREE.AnimationMixer;
+  private mixer!: THREE.AnimationMixer;
   clock = new THREE.Clock();
-  cabeza?: THREE.Object3D;
+  cabeza!: THREE.Group<THREE.Object3DEventMap>;
   //raycaster?: THREE.Raycaster;
   //mouse?: THREE.Vector2;
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;
+    const datGui = new dat.GUI();
 
     //create a scene----------------------------------------
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('skyblue');
+    scene.background = new THREE.Color('black');
     const axesHelper = new THREE.AxesHelper(5); // Specify the length of the axes
     scene.add(axesHelper);
     const directionalLight = new THREE.AmbientLight();
     directionalLight.castShadow = true;
     directionalLight.intensity = 1;
-    directionalLight.position.set(15, 15, 15);
     scene.add(directionalLight);
+
+    const lighting = new THREE.DirectionalLight();
+    lighting.position.set(0, 0, 10);
+    lighting.castShadow = true;
+    lighting.intensity = 1;
+    scene.add(lighting);
 
     // const datGui = new dat.GUI();
     // datGui.add(directionalLight, 'intensity', 0, 1, 0.1).step(0.1);
@@ -43,69 +55,59 @@ export class RobotComponent {
     // //texture loader----------------------------------------
     const textureLoader = new THREE.TextureLoader();
     const texture = textureLoader.load(
-      '../../../assets/textures/bluetexture.jpg'
+      '../../../assets/textures/robo_rusty.jpeg'
     );
+
+    //particals-----------------------------
+    const particalGeometry = new THREE.BufferGeometry();
+    const vertices = 10000;
+    const positions = new Float32Array(vertices * 3);
+    for (let i = 0; i < vertices * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * 30;
+    }
+    particalGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(positions, 3)
+    );
+    const particalMaterial = new THREE.PointsMaterial({});
+    particalMaterial.size = 0.009;
+    particalMaterial.transparent = true;
+    //particalMaterial.alphaMap = texture;
+    particalMaterial.blendColor = new THREE.Color('white');
+    particalMaterial.depthTest = false;
+    const particalMesh = new THREE.Points(particalGeometry, particalMaterial);
+    scene.add(particalMesh);
 
     //load the model----------------------------------------
     const loader = new GLTFLoader();
 
     loader.load(
       // resource URL
-      '../../../assets/robot/robot.gltf',
+      '../../../assets/robo_fix/fight_robo.gltf',
       // called when the resource is loaded
 
       (gltf) => {
         // Use an arrow function here
+        const model = gltf.scene;
+        // model.lookAt(0, 0, 0);
+        this.cabeza = model;
 
-        gltf.animations; // Array<THREE.AnimationClip>
-        const model = gltf.scene; // THREE.Group
-        gltf.scenes; // Array<THREE.Group>
-        gltf.cameras; // Array<THREE.Camera>
-        //console.log(gltf.scene.children[0]);
-        console.log(gltf.scene.children[0].children[0].children);
-
-        model.traverse((child) => {
-          // console.log(`child name ${child.name}`);
-          if (child instanceof THREE.Mesh && child.name !== 'Plane') {
-            // console.log(`child name ${child.name}`);
-            child.material = new THREE.MeshStandardMaterial({
-              metalness: 0.9,
-              roughness: 0.1,
-              envMap: texture,
-            });
-          }
-          if (
-            child instanceof THREE.Mesh == false &&
-            child instanceof THREE.Object3D
-          ) {
-            if (child.name === 'Cabeza') {
-              console.log('child cabeza');
-              this.cabeza = child;
-              child.traverse((grandchild) => {
-                if (grandchild instanceof THREE.Mesh) {
-                  console.log(` grand childs :${grandchild.name}`);
-                  grandchild.material = new THREE.MeshStandardMaterial({
-                    color: 'white',
-                    roughness: 0.2,
-                    metalness: 0.9,
-                  });
-                }
-              });
-            }
-            //   child.traverse((grandchild) => {
-            //     if (grandchild instanceof THREE.Mesh) {
-            //       console.log(` grand childs :${grandchild.name}`);
-            //       grandchild.material = new THREE.MeshStandardMaterial({
-            //         color: new THREE.Color('red'),
-            //       });
-            //     }
-            //   });
-          }
-        });
-        model.scale.set(3, 3, 3);
-        model.position.set(0, 3, 0);
+        console.log('----------------------');
+        model.castShadow = true;
+        model.position.set(0, 0, 0);
+        model.scale.set(0.5, 0.5, 0.5);
         scene.add(model);
-        // Object
+
+        this.mixer = new THREE.AnimationMixer(model);
+
+        if (gltf.animations && gltf.animations.length > 0) {
+          gltf.animations.forEach((clip) => {
+            console.log('clipName: ', clip.name);
+            this.mixer.clipAction(clip).play();
+          });
+        } else {
+          console.log('No animations found in the model.');
+        }
       },
       // called while loading is progressing
       function (xhr) {
@@ -113,7 +115,7 @@ export class RobotComponent {
       },
       // called when loading has errors
       function (error) {
-        console.log('An error happened');
+        console.log('An error happened ' + error);
       }
     );
 
@@ -139,7 +141,12 @@ export class RobotComponent {
       1,
       1000
     );
-    camera.position.z = 14;
+    camera.position.z = 13;
+    camera.position.y = 10;
+    camera.position.x = 6;
+    datGui.add(camera.position, 'z', 0, 100, 1).step(1);
+    datGui.add(camera.position, 'y', -100, 100, 1).step(1);
+    datGui.add(camera.position, 'x', -100, 100, 1).step(1);
 
     //create a renderer-------------------------------------------
     const renderer = new THREE.WebGLRenderer({
@@ -156,15 +163,49 @@ export class RobotComponent {
     const animate = () => {
       const delta = this.clock.getDelta();
       requestAnimationFrame(animate);
+      particalMesh.rotateY(delta * 0.1);
+
+      if (this.mixer) {
+        this.mixer.update(delta * 0.5);
+      }
 
       if (this.cabeza) {
         this.cabeza.lookAt(lookAt.x, -lookAt.y, 1);
       }
 
+      aspect.width = window.innerWidth;
+      aspect.height = window.innerHeight;
+      camera.aspect = aspect.width / aspect.height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(aspect.width, aspect.height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); //for retina display
       orbitcontrols.update();
-
       renderer.render(scene, camera); //render the scene
+      composer.render();
     };
+    // post processing----------------------------------------
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1,
+      0.4,
+      0.85
+    );
+    //  bloomPass.
+    renderer.toneMappingExposure = Math.pow(2, 8.0);
+    bloomPass.threshold = 0.6;
+    bloomPass.strength = 0.4; // Bloom strength
+    bloomPass.radius = 10; // Bloom radius
+    // datGui.add(bloomPass, 'threshold', 0, 1, 0.1).step(0.1);
+    // datGui.add(bloomPass, 'strength', 0, 1, 0.1).step(0.1);
+    // datGui.add(bloomPass, 'radius', 0, 500, 10).step(10);
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+    //  this.bloomObject?.layers.set(1);
+    // camera.layers.enable(0);
+    camera.layers.enableAll();
     animate();
   }
 }

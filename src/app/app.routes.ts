@@ -7,9 +7,11 @@ import { ModelsComponent } from './components/models/models.component';
 import { PortfolioComponent } from './components/portfolio/portfolio.component';
 import { RobotComponent } from './components/robot/robot.component';
 import { GeometryComponent } from './components/geometry/geometry.component';
+import { ProjectsComponent } from './components/projects/projects.component';
+import { ExperienceComponent } from './components/experience/experience.component';
 
 export const routes: Routes = [
-  { path: 'home', component: ThreeComponent },
+  { path: 'home', component: RobotComponent },
   { path: 'lookat', component: LookatComponent },
   { path: '', redirectTo: 'home', pathMatch: 'full' },
   { path: 'texture', component: TextureComponent },
@@ -18,4 +20,6 @@ export const routes: Routes = [
   { path: 'portfolio', component: PortfolioComponent },
   { path: 'robot', component: RobotComponent },
   { path: 'geometry', component: GeometryComponent },
+  { path: 'projects', component: ProjectsComponent },
+  { path: 'experience', component: PortfolioComponent },
 ];

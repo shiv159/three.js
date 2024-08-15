@@ -9,10 +9,14 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { NavbarComponent } from '../navbar/navbar.component';
 
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatListModule } from '@angular/material/list';
+
 @Component({
   selector: 'app-portfolio',
   standalone: true,
-  imports: [NavbarComponent],
+  imports: [NavbarComponent, MatButtonModule, MatListModule, MatCardModule],
   templateUrl: './portfolio.component.html',
   styleUrl: './portfolio.component.css',
 })
@@ -41,8 +45,8 @@ export class PortfolioComponent {
     //const axesHelper = new THREE.AxesHelper(5); // Specify the length of the axes
     //scene.add(axesHelper);
     //LIghts----------------------------------------
-    const light = new THREE.DirectionalLight('white', 1);
-    light.position.set(0, 0, 10);
+    const light = new THREE.DirectionalLight('red', 1);
+    light.position.set(0, 9, -8);
     scene.add(light);
 
     const datGui = new dat.GUI();
@@ -90,32 +94,13 @@ export class PortfolioComponent {
         // Use an arrow function here
         const model = gltf.scene;
         model.scale.set(1, 1, 1);
+        model.position.add(new THREE.Vector3(0, 2, 0));
         scene.add(model);
         console.log(model.children);
         model.traverse((object) => {
           console.log(object);
           if (object instanceof THREE.Mesh) {
             console.log(object.name);
-            this.bloomObject = object;
-            this.bloomObject.layers.set(0);
-            object.material.transparent = true;
-            // object.material.opacity = 0.8;
-            const geometry = object.geometry;
-            const vertices = geometry.attributes.position.array;
-            const particleGeometry = new THREE.BufferGeometry();
-            particleGeometry.setAttribute(
-              'position',
-              new THREE.Float32BufferAttribute(vertices, 3)
-            );
-            const particleMaterial = new THREE.PointsMaterial({
-              size: 0.001, // Adjust particle size
-              transparent: true,
-            });
-            const particles = new THREE.Points(
-              particleGeometry,
-              particleMaterial
-            );
-            scene.add(particles);
           } else if (object instanceof THREE.Object3D) {
             object.scale.set(1, 1, 1);
           }
@@ -160,12 +145,12 @@ export class PortfolioComponent {
       1000
     );
     camera.position.z = 6;
+    camera.lookAt(light.position);
     //set size of renderer
 
     //orbit controls-----------------------------------------------
     const orbitcontrols = new OrbitControls(camera, canvas);
     orbitcontrols.dampingFactor = 0.2;
-
     //create a animate function------------------------------------
     const animate = () => {
       const delta = this.clock.getDelta();
@@ -173,6 +158,7 @@ export class PortfolioComponent {
         this.mixer.update(delta);
         // console.log(delta);
       }
+
       particalMesh.rotateY(delta * 0.1);
       requestAnimationFrame(animate);
       camera.layers.enableAll();
@@ -190,8 +176,8 @@ export class PortfolioComponent {
     //  bloomPass.
     renderer.toneMappingExposure = Math.pow(2, 5.0);
     bloomPass.threshold = 5;
-    bloomPass.strength = 0.1; // Bloom strength
-    bloomPass.radius = 100; // Bloom radius
+    bloomPass.strength = 0.05; // Bloom strength
+    bloomPass.radius = 75; // Bloom radius
     datGui.add(bloomPass, 'threshold', 0, 1, 0.1).step(0.1);
     datGui.add(bloomPass, 'strength', 0, 1, 0.1).step(0.1);
     datGui.add(bloomPass, 'radius', 0, 500, 10).step(10);

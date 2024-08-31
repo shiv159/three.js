@@ -1,9 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as dat from 'dat.gui';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -28,7 +26,6 @@ export class RobotComponent {
 
   ngAfterViewInit(): void {
     const canvas = this.canvasRef.nativeElement;
-    const datGui = new dat.GUI();
 
     //create a scene----------------------------------------
     const scene = new THREE.Scene();
@@ -144,9 +141,6 @@ export class RobotComponent {
     camera.position.z = 13;
     camera.position.y = 10;
     camera.position.x = 6;
-    datGui.add(camera.position, 'z', 0, 100, 1).step(1);
-    datGui.add(camera.position, 'y', -100, 100, 1).step(1);
-    datGui.add(camera.position, 'x', -100, 100, 1).step(1);
 
     //create a renderer-------------------------------------------
     const renderer = new THREE.WebGLRenderer({

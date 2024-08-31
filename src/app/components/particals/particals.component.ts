@@ -1,7 +1,6 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import * as dat from 'dat.gui';
 
 @Component({
   selector: 'app-particals',
@@ -23,7 +22,6 @@ export class ParticalsComponent {
     scene.add(axesHelper);
 
     //debugger dat.ui-------------------------------------------
-    const gui = new dat.GUI();
 
     //adding light-------------------------------------------
     //few matreial require light to be visible
@@ -67,11 +65,6 @@ export class ParticalsComponent {
     material.depthTest = false;
     const mesh = new THREE.Points(geometry, material);
     scene.add(mesh);
-
-    //debugger-------------------------------------------
-    gui.add(material, 'size').min(0).max(1).step(0.01);
-    gui.add(mesh.position, 'y').min(-3).max(3).step(0.01);
-    gui.add(pointLight.position, 'x').min(-3).max(3).step(0.01);
 
     //create a camera------------------------------------------
     const aspect = {

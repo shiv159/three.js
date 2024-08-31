@@ -1,9 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import * as dat from 'dat.gui';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
@@ -49,11 +47,6 @@ export class PortfolioComponent {
     light.position.set(0, 9, -8);
     scene.add(light);
 
-    const datGui = new dat.GUI();
-    datGui.add(light, 'intensity', 0, 1, 0.1).step(0.1);
-    datGui.add(light.position, 'y').min(-15).max(15).step(1);
-    datGui.add(light.position, 'x').min(-15).max(15).step(1);
-    datGui.add(light.position, 'z').min(-15).max(15).step(1);
     //datGui.addColor('backgroundColor', 'white');
     //texture loader----------------------------------------
     const textureLoader = new THREE.TextureLoader();
@@ -178,9 +171,6 @@ export class PortfolioComponent {
     bloomPass.threshold = 5;
     bloomPass.strength = 0.05; // Bloom strength
     bloomPass.radius = 75; // Bloom radius
-    datGui.add(bloomPass, 'threshold', 0, 1, 0.1).step(0.1);
-    datGui.add(bloomPass, 'strength', 0, 1, 0.1).step(0.1);
-    datGui.add(bloomPass, 'radius', 0, 500, 10).step(10);
 
     const composer = new EffectComposer(renderer);
     composer.addPass(renderScene);

@@ -1,7 +1,7 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { NavbarComponent } from '../navbar/navbar.component';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { ProjectsService } from '../../services/projects.service';
 import { Project } from '../../models/project';
 import { MatCardModule } from '@angular/material/card';
